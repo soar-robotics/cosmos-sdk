@@ -1,6 +1,3 @@
-//go:build e2e
-// +build e2e
-
 package testutil
 
 import (
@@ -11,8 +8,8 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-func TestIntegrationTestSuite(t *testing.T) {
+func TestE2ETestSuite(t *testing.T) {
 	cfg := network.DefaultConfig(simapp.NewTestNetworkFixture)
 	cfg.NumValidators = 2
-	suite.Run(t, NewIntegrationTestSuite(cfg))
+	suite.Run(t, NewE2ETestSuite(cfg))
 }

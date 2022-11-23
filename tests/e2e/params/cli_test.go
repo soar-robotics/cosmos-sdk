@@ -13,8 +13,8 @@ import (
 	clienttestutil "github.com/cosmos/cosmos-sdk/x/params/client/testutil"
 )
 
-func TestIntegrationTestSuite(t *testing.T) {
+func TestE2ETestSuite(t *testing.T) {
 	cfg := network.DefaultConfig(simapp.NewTestNetworkFixture)
 	cfg.NumValidators = 1
-	suite.Run(t, clienttestutil.NewIntegrationTestSuite(cfg))
+	suite.Run(t, clienttestutil.NewE2ETestSuite(cfg))
 }

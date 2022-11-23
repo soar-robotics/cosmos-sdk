@@ -29,7 +29,7 @@ func NewEndToEndTestSuite(cfg network.Config) *EndToEndTestSuite {
 // SetupSuite executes bootstrapping logic before all the tests, i.e. once before
 // the entire suite, start executing.
 func (s *EndToEndTestSuite) SetupSuite() {
-	s.T().Log("setting up integration test suite")
+	s.T().Log("setting up e2e test suite")
 
 	var err error
 	s.network, err = network.New(s.T(), s.T().TempDir(), s.cfg)
@@ -41,7 +41,7 @@ func (s *EndToEndTestSuite) SetupSuite() {
 // TearDownSuite performs cleanup logic after all the tests, i.e. once after the
 // entire suite, has finished executing.
 func (s *EndToEndTestSuite) TearDownSuite() {
-	s.T().Log("tearing down integration test suite")
+	s.T().Log("tearing down e2e test suite")
 	s.network.Cleanup()
 }
 

@@ -84,9 +84,9 @@ func (suite *IntegrationTestSuite) TestGRPCQueryValidators() {
 }
 
 func (suite *IntegrationTestSuite) TestGRPCQueryDelegatorValidators() {
-	app, ctx, queryClient, addrs := suite.app, suite.ctx, suite.queryClient, suite.addrs
-	params := app.StakingKeeper.GetParams(ctx)
-	delValidators := app.StakingKeeper.GetDelegatorValidators(ctx, addrs[0], params.MaxValidators)
+	ctx, queryClient, addrs := suite.ctx, suite.queryClient, suite.addrs
+	params := suite.stakingKeeper.GetParams(ctx)
+	delValidators := suite.stakingKeeper.GetDelegatorValidators(ctx, addrs[0], params.MaxValidators)
 	var req *types.QueryDelegatorValidatorsRequest
 	testCases := []struct {
 		msg      string
@@ -184,12 +184,12 @@ func (suite *IntegrationTestSuite) TestGRPCQueryDelegatorValidator() {
 }
 
 func (suite *IntegrationTestSuite) TestGRPCQueryDelegation() {
-	app, ctx, queryClient, addrs, vals := suite.app, suite.ctx, suite.queryClient, suite.addrs, suite.vals
+	ctx, queryClient, addrs, vals := suite.ctx, suite.queryClient, suite.addrs, suite.vals
 	addrAcc, addrAcc1 := addrs[0], addrs[1]
 	addrVal := vals[0].OperatorAddress
 	valAddr, err := sdk.ValAddressFromBech32(addrVal)
 	suite.NoError(err)
-	delegation, found := app.StakingKeeper.GetDelegation(ctx, addrAcc, valAddr)
+	delegation, found := suite.stakingKeeper.GetDelegation(ctx, addrAcc, valAddr)
 	suite.True(found)
 	var req *types.QueryDelegationRequest
 
@@ -241,12 +241,12 @@ func (suite *IntegrationTestSuite) TestGRPCQueryDelegation() {
 }
 
 func (suite *IntegrationTestSuite) TestGRPCQueryDelegatorDelegations() {
-	app, ctx, queryClient, addrs, vals := suite.app, suite.ctx, suite.queryClient, suite.addrs, suite.vals
+	ctx, queryClient, addrs, vals := suite.ctx, suite.queryClient, suite.addrs, suite.vals
 	addrAcc := addrs[0]
 	addrVal1 := vals[0].OperatorAddress
 	valAddr, err := sdk.ValAddressFromBech32(addrVal1)
 	suite.NoError(err)
-	delegation, found := app.StakingKeeper.GetDelegation(ctx, addrAcc, valAddr)
+	delegation, found := suite.stakingKeeper.GetDelegation(ctx, addrAcc, valAddr)
 	suite.True(found)
 	var req *types.QueryDelegatorDelegationsRequest
 
@@ -307,14 +307,14 @@ func (suite *IntegrationTestSuite) TestGRPCQueryDelegatorDelegations() {
 }
 
 func (suite *IntegrationTestSuite) TestGRPCQueryValidatorDelegations() {
-	app, ctx, queryClient, addrs, vals := suite.app, suite.ctx, suite.queryClient, suite.addrs, suite.vals
+	ctx, queryClient, addrs, vals := suite.ctx, suite.queryClient, suite.addrs, suite.vals
 	addrAcc := addrs[0]
 	addrVal1 := vals[1].OperatorAddress
 	valAddrs := simtestutil.ConvertAddrsToValAddrs(addrs)
 	addrVal2 := valAddrs[4]
 	valAddr, err := sdk.ValAddressFromBech32(addrVal1)
 	suite.NoError(err)
-	delegation, found := app.StakingKeeper.GetDelegation(ctx, addrAcc, valAddr)
+	delegation, found := suite.stakingKeeper.GetDelegation(ctx, addrAcc, valAddr)
 	suite.True(found)
 
 	var req *types.QueryValidatorDelegationsRequest
@@ -376,17 +376,17 @@ func (suite *IntegrationTestSuite) TestGRPCQueryValidatorDelegations() {
 }
 
 func (suite *IntegrationTestSuite) TestGRPCQueryUnbondingDelegation() {
-	app, ctx, queryClient, addrs, vals := suite.app, suite.ctx, suite.queryClient, suite.addrs, suite.vals
+	ctx, queryClient, addrs, vals := suite.ctx, suite.queryClient, suite.addrs, suite.vals
 	addrAcc2 := addrs[1]
 	addrVal2 := vals[1].OperatorAddress
 
-	unbondingTokens := app.StakingKeeper.TokensFromConsensusPower(ctx, 2)
+	unbondingTokens := suite.stakingKeeper.TokensFromConsensusPower(ctx, 2)
 	valAddr, err1 := sdk.ValAddressFromBech32(addrVal2)
 	suite.NoError(err1)
-	_, err := app.StakingKeeper.Undelegate(ctx, addrAcc2, valAddr, sdk.NewDecFromInt(unbondingTokens))
+	_, err := suite.stakingKeeper.Undelegate(ctx, addrAcc2, valAddr, sdk.NewDecFromInt(unbondingTokens))
 	suite.NoError(err)
 
-	unbond, found := app.StakingKeeper.GetUnbondingDelegation(ctx, addrAcc2, valAddr)
+	unbond, found := suite.stakingKeeper.GetUnbondingDelegation(ctx, addrAcc2, valAddr)
 	suite.True(found)
 	var req *types.QueryUnbondingDelegationRequest
 	testCases := []struct {
@@ -435,21 +435,21 @@ func (suite *IntegrationTestSuite) TestGRPCQueryUnbondingDelegation() {
 }
 
 func (suite *IntegrationTestSuite) TestGRPCQueryDelegatorUnbondingDelegations() {
-	app, ctx, queryClient, addrs, vals := suite.app, suite.ctx, suite.queryClient, suite.addrs, suite.vals
+	ctx, queryClient, addrs, vals := suite.ctx, suite.queryClient, suite.addrs, suite.vals
 	addrAcc, addrAcc1 := addrs[0], addrs[1]
 	addrVal, addrVal2 := vals[0].OperatorAddress, vals[1].OperatorAddress
 
-	unbondingTokens := app.StakingKeeper.TokensFromConsensusPower(ctx, 2)
+	unbondingTokens := suite.stakingKeeper.TokensFromConsensusPower(ctx, 2)
 	valAddr1, err1 := sdk.ValAddressFromBech32(addrVal)
 	suite.NoError(err1)
-	_, err := app.StakingKeeper.Undelegate(ctx, addrAcc, valAddr1, sdk.NewDecFromInt(unbondingTokens))
+	_, err := suite.stakingKeeper.Undelegate(ctx, addrAcc, valAddr1, sdk.NewDecFromInt(unbondingTokens))
 	suite.NoError(err)
 	valAddr2, err1 := sdk.ValAddressFromBech32(addrVal2)
 	suite.NoError(err1)
-	_, err = app.StakingKeeper.Undelegate(ctx, addrAcc, valAddr2, sdk.NewDecFromInt(unbondingTokens))
+	_, err = suite.stakingKeeper.Undelegate(ctx, addrAcc, valAddr2, sdk.NewDecFromInt(unbondingTokens))
 	suite.NoError(err)
 
-	unbond, found := app.StakingKeeper.GetUnbondingDelegation(ctx, addrAcc, valAddr1)
+	unbond, found := suite.stakingKeeper.GetUnbondingDelegation(ctx, addrAcc, valAddr1)
 	suite.True(found)
 	var req *types.QueryDelegatorUnbondingDelegationsRequest
 	testCases := []struct {
@@ -509,27 +509,27 @@ func (suite *IntegrationTestSuite) TestGRPCQueryDelegatorUnbondingDelegations() 
 }
 
 func (suite *IntegrationTestSuite) TestGRPCQueryPoolParameters() {
-	app, ctx, queryClient := suite.app, suite.ctx, suite.queryClient
+	ctx, queryClient := suite.ctx, suite.queryClient
 	bondDenom := sdk.DefaultBondDenom
 
 	// Query pool
 	res, err := queryClient.Pool(gocontext.Background(), &types.QueryPoolRequest{})
 	suite.NoError(err)
-	bondedPool := app.StakingKeeper.GetBondedPool(ctx)
-	notBondedPool := app.StakingKeeper.GetNotBondedPool(ctx)
-	suite.Equal(app.BankKeeper.GetBalance(ctx, notBondedPool.GetAddress(), bondDenom).Amount, res.Pool.NotBondedTokens)
-	suite.Equal(app.BankKeeper.GetBalance(ctx, bondedPool.GetAddress(), bondDenom).Amount, res.Pool.BondedTokens)
+	bondedPool := suite.stakingKeeper.GetBondedPool(ctx)
+	notBondedPool := suite.stakingKeeper.GetNotBondedPool(ctx)
+	suite.Equal(suite.bankKeeper.GetBalance(ctx, notBondedPool.GetAddress(), bondDenom).Amount, res.Pool.NotBondedTokens)
+	suite.Equal(suite.bankKeeper.GetBalance(ctx, bondedPool.GetAddress(), bondDenom).Amount, res.Pool.BondedTokens)
 
 	// Query Params
 	resp, err := queryClient.Params(gocontext.Background(), &types.QueryParamsRequest{})
 	suite.NoError(err)
-	suite.Equal(app.StakingKeeper.GetParams(ctx), resp.Params)
+	suite.Equal(suite.stakingKeeper.GetParams(ctx), resp.Params)
 }
 
 func (suite *IntegrationTestSuite) TestGRPCQueryHistoricalInfo() {
-	app, ctx, queryClient := suite.app, suite.ctx, suite.queryClient
+	ctx, queryClient := suite.ctx, suite.queryClient
 
-	hi, found := app.StakingKeeper.GetHistoricalInfo(ctx, 5)
+	hi, found := suite.stakingKeeper.GetHistoricalInfo(ctx, 5)
 	suite.True(found)
 
 	var req *types.QueryHistoricalInfoRequest
@@ -585,22 +585,22 @@ func (suite *IntegrationTestSuite) TestGRPCQueryHistoricalInfo() {
 }
 
 func (suite *IntegrationTestSuite) TestGRPCQueryRedelegations() {
-	app, ctx, queryClient, addrs, vals := suite.app, suite.ctx, suite.queryClient, suite.addrs, suite.vals
+	ctx, queryClient, addrs, vals := suite.ctx, suite.queryClient, suite.addrs, suite.vals
 
 	addrAcc, addrAcc1 := addrs[0], addrs[1]
 	valAddrs := simtestutil.ConvertAddrsToValAddrs(addrs)
 	val1, val2, val3, val4 := vals[0], vals[1], valAddrs[3], valAddrs[4]
-	delAmount := app.StakingKeeper.TokensFromConsensusPower(ctx, 1)
-	_, err := app.StakingKeeper.Delegate(ctx, addrAcc1, delAmount, types.Unbonded, val1, true)
+	delAmount := suite.stakingKeeper.TokensFromConsensusPower(ctx, 1)
+	_, err := suite.stakingKeeper.Delegate(ctx, addrAcc1, delAmount, types.Unbonded, val1, true)
 	suite.NoError(err)
-	applyValidatorSetUpdates(suite.T(), ctx, app.StakingKeeper, -1)
+	applyValidatorSetUpdates(suite.T(), ctx, suite.stakingKeeper, -1)
 
-	rdAmount := app.StakingKeeper.TokensFromConsensusPower(ctx, 1)
-	_, err = app.StakingKeeper.BeginRedelegation(ctx, addrAcc1, val1.GetOperator(), val2.GetOperator(), sdk.NewDecFromInt(rdAmount))
+	rdAmount := suite.stakingKeeper.TokensFromConsensusPower(ctx, 1)
+	_, err = suite.stakingKeeper.BeginRedelegation(ctx, addrAcc1, val1.GetOperator(), val2.GetOperator(), sdk.NewDecFromInt(rdAmount))
 	suite.NoError(err)
-	applyValidatorSetUpdates(suite.T(), ctx, app.StakingKeeper, -1)
+	applyValidatorSetUpdates(suite.T(), ctx, suite.stakingKeeper, -1)
 
-	redel, found := app.StakingKeeper.GetRedelegation(ctx, addrAcc1, val1.GetOperator(), val2.GetOperator())
+	redel, found := suite.stakingKeeper.GetRedelegation(ctx, addrAcc1, val1.GetOperator(), val2.GetOperator())
 	suite.True(found)
 
 	var req *types.QueryRedelegationsRequest
@@ -687,15 +687,15 @@ func (suite *IntegrationTestSuite) TestGRPCQueryRedelegations() {
 }
 
 func (suite *IntegrationTestSuite) TestGRPCQueryValidatorUnbondingDelegations() {
-	app, ctx, queryClient, addrs, vals := suite.app, suite.ctx, suite.queryClient, suite.addrs, suite.vals
+	ctx, queryClient, addrs, vals := suite.ctx, suite.queryClient, suite.addrs, suite.vals
 	addrAcc1, _ := addrs[0], addrs[1]
 	val1 := vals[0]
 
 	// undelegate
-	undelAmount := app.StakingKeeper.TokensFromConsensusPower(ctx, 2)
-	_, err := app.StakingKeeper.Undelegate(ctx, addrAcc1, val1.GetOperator(), sdk.NewDecFromInt(undelAmount))
+	undelAmount := suite.stakingKeeper.TokensFromConsensusPower(ctx, 2)
+	_, err := suite.stakingKeeper.Undelegate(ctx, addrAcc1, val1.GetOperator(), sdk.NewDecFromInt(undelAmount))
 	suite.NoError(err)
-	applyValidatorSetUpdates(suite.T(), ctx, app.StakingKeeper, -1)
+	applyValidatorSetUpdates(suite.T(), ctx, suite.stakingKeeper, -1)
 
 	var req *types.QueryValidatorUnbondingDelegationsRequest
 	testCases := []struct {

@@ -34,7 +34,7 @@ func NewEndToEndTestSuite(cfg network.Config) *EndToEndTestSuite {
 }
 
 func (s *EndToEndTestSuite) SetupSuite() {
-	s.T().Log("setting up integration test suite")
+	s.T().Log("setting up e2e test suite")
 
 	genesisState := s.cfg.GenesisState
 	var bankGenesis types.GenesisState
@@ -91,7 +91,7 @@ func (s *EndToEndTestSuite) SetupSuite() {
 }
 
 func (s *EndToEndTestSuite) TearDownSuite() {
-	s.T().Log("tearing down integration test suite")
+	s.T().Log("tearing down e2e test suite")
 	s.network.Cleanup()
 }
 

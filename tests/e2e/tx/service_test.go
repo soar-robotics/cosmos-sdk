@@ -36,7 +36,7 @@ import (
 
 var bankMsgSendEventAction = fmt.Sprintf("message.action='%s'", sdk.MsgTypeURL(&banktypes.MsgSend{}))
 
-type IntegrationTestSuite struct {
+type E2ETestSuite struct {
 	suite.Suite
 
 	cfg     network.Config
@@ -47,8 +47,8 @@ type IntegrationTestSuite struct {
 	txRes       sdk.TxResponse
 }
 
-func (s *IntegrationTestSuite) SetupSuite() {
-	s.T().Log("setting up integration test suite")
+func (s *E2ETestSuite) SetupSuite() {
+	s.T().Log("setting up e2e test suite")
 
 	cfg := network.DefaultConfig(simapp.NewTestNetworkFixture)
 	cfg.NumValidators = 1
@@ -106,12 +106,12 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	s.txHeight = height
 }
 
-func (s *IntegrationTestSuite) TearDownSuite() {
-	s.T().Log("tearing down integration test suite")
+func (s *E2ETestSuite) TearDownSuite() {
+	s.T().Log("tearing down e2e test suite")
 	s.network.Cleanup()
 }
 
-func (s *IntegrationTestSuite) TestQueryBySig() {
+func (s *E2ETestSuite) TestQueryBySig() {
 	// broadcast tx
 	txb := s.mkTxBuilder()
 	txbz, err := s.cfg.TxConfig.TxEncoder()(txb.GetTx())
@@ -192,7 +192,7 @@ func TestEventRegex(t *testing.T) {
 	}
 }
 
-func (s IntegrationTestSuite) TestSimulateTx_GRPC() {
+func (s E2ETestSuite) TestSimulateTx_GRPC() {
 	val := s.network.Validators[0]
 	txBuilder := s.mkTxBuilder()
 	// Convert the txBuilder to a tx.Tx.
@@ -239,7 +239,7 @@ func (s IntegrationTestSuite) TestSimulateTx_GRPC() {
 	}
 }
 
-func (s IntegrationTestSuite) TestSimulateTx_GRPCGateway() {
+func (s E2ETestSuite) TestSimulateTx_GRPCGateway() {
 	val := s.network.Validators[0]
 	txBuilder := s.mkTxBuilder()
 	// Convert the txBuilder to a tx.Tx.
@@ -281,7 +281,7 @@ func (s IntegrationTestSuite) TestSimulateTx_GRPCGateway() {
 	}
 }
 
-func (s IntegrationTestSuite) TestGetTxEvents_GRPC() {
+func (s E2ETestSuite) TestGetTxEvents_GRPC() {
 	testCases := []struct {
 		name      string
 		req       *tx.GetTxsEventRequest
@@ -358,7 +358,7 @@ func (s IntegrationTestSuite) TestGetTxEvents_GRPC() {
 	}
 }
 
-func (s IntegrationTestSuite) TestGetTxEvents_GRPCGateway() {
+func (s E2ETestSuite) TestGetTxEvents_GRPCGateway() {
 	val := s.network.Validators[0]
 	testCases := []struct {
 		name      string
@@ -435,7 +435,7 @@ func (s IntegrationTestSuite) TestGetTxEvents_GRPCGateway() {
 	}
 }
 
-func (s IntegrationTestSuite) TestGetTx_GRPC() {
+func (s E2ETestSuite) TestGetTx_GRPC() {
 	testCases := []struct {
 		name      string
 		req       *tx.GetTxRequest
@@ -462,7 +462,7 @@ func (s IntegrationTestSuite) TestGetTx_GRPC() {
 	}
 }
 
-func (s IntegrationTestSuite) TestGetTx_GRPCGateway() {
+func (s E2ETestSuite) TestGetTx_GRPCGateway() {
 	val := s.network.Validators[0]
 	testCases := []struct {
 		name      string
@@ -509,7 +509,7 @@ func (s IntegrationTestSuite) TestGetTx_GRPCGateway() {
 	}
 }
 
-func (s IntegrationTestSuite) TestBroadcastTx_GRPC() {
+func (s E2ETestSuite) TestBroadcastTx_GRPC() {
 	val := s.network.Validators[0]
 	txBuilder := s.mkTxBuilder()
 	txBytes, err := val.ClientCtx.TxConfig.TxEncoder()(txBuilder.GetTx())
@@ -547,7 +547,7 @@ func (s IntegrationTestSuite) TestBroadcastTx_GRPC() {
 	}
 }
 
-func (s IntegrationTestSuite) TestBroadcastTx_GRPCGateway() {
+func (s E2ETestSuite) TestBroadcastTx_GRPCGateway() {
 	val := s.network.Validators[0]
 	txBuilder := s.mkTxBuilder()
 	txBytes, err := val.ClientCtx.TxConfig.TxEncoder()(txBuilder.GetTx())
@@ -585,7 +585,7 @@ func (s IntegrationTestSuite) TestBroadcastTx_GRPCGateway() {
 	}
 }
 
-func (s *IntegrationTestSuite) TestSimMultiSigTx() {
+func (s *E2ETestSuite) TestSimMultiSigTx() {
 	val1 := *s.network.Validators[0]
 
 	kr := val1.ClientCtx.Keyring
@@ -692,7 +692,7 @@ func (s *IntegrationTestSuite) TestSimMultiSigTx() {
 	s.Require().Greater(res.GasInfo.GasUsed, uint64(0))
 }
 
-func (s IntegrationTestSuite) TestGetBlockWithTxs_GRPC() {
+func (s E2ETestSuite) TestGetBlockWithTxs_GRPC() {
 	testCases := []struct {
 		name      string
 		req       *tx.GetBlockWithTxsRequest
@@ -730,7 +730,7 @@ func (s IntegrationTestSuite) TestGetBlockWithTxs_GRPC() {
 	}
 }
 
-func (s IntegrationTestSuite) TestGetBlockWithTxs_GRPCGateway() {
+func (s E2ETestSuite) TestGetBlockWithTxs_GRPCGateway() {
 	val := s.network.Validators[0]
 	testCases := []struct {
 		name      string
@@ -771,7 +771,7 @@ func (s IntegrationTestSuite) TestGetBlockWithTxs_GRPCGateway() {
 	}
 }
 
-func (s IntegrationTestSuite) TestTxEncode_GRPC() {
+func (s E2ETestSuite) TestTxEncode_GRPC() {
 	txBuilder := s.mkTxBuilder()
 	protoTx, err := txBuilderToProtoTx(txBuilder)
 	s.Require().NoError(err)
@@ -803,7 +803,7 @@ func (s IntegrationTestSuite) TestTxEncode_GRPC() {
 	}
 }
 
-func (s *IntegrationTestSuite) TestTxEncode_GRPCGateway() {
+func (s *E2ETestSuite) TestTxEncode_GRPCGateway() {
 	val := s.network.Validators[0]
 	txBuilder := s.mkTxBuilder()
 	protoTx, err := txBuilderToProtoTx(txBuilder)
@@ -835,7 +835,7 @@ func (s *IntegrationTestSuite) TestTxEncode_GRPCGateway() {
 	}
 }
 
-func (s IntegrationTestSuite) TestTxDecode_GRPC() {
+func (s E2ETestSuite) TestTxDecode_GRPC() {
 	val := s.network.Validators[0]
 	txBuilder := s.mkTxBuilder()
 
@@ -872,7 +872,7 @@ func (s IntegrationTestSuite) TestTxDecode_GRPC() {
 	}
 }
 
-func (s IntegrationTestSuite) TestTxDecode_GRPCGateway() {
+func (s E2ETestSuite) TestTxDecode_GRPCGateway() {
 	val := s.network.Validators[0]
 	txBuilder := s.mkTxBuilder()
 
@@ -908,11 +908,11 @@ func (s IntegrationTestSuite) TestTxDecode_GRPCGateway() {
 	}
 }
 
-func TestIntegrationTestSuite(t *testing.T) {
-	suite.Run(t, new(IntegrationTestSuite))
+func TestE2ETestSuite(t *testing.T) {
+	suite.Run(t, new(E2ETestSuite))
 }
 
-func (s IntegrationTestSuite) mkTxBuilder() client.TxBuilder {
+func (s E2ETestSuite) mkTxBuilder() client.TxBuilder {
 	val := s.network.Validators[0]
 	s.Require().NoError(s.network.WaitForNextBlock())
 
