@@ -15,5 +15,5 @@ import (
 func TestE2ETestSuite(t *testing.T) {
 	cfg := network.DefaultConfig(simapp.NewTestNetworkFixture)
 	cfg.NumValidators = 1
-	suite.Run(t, NewEndToEndTestSuite(cfg))
+	suite.Run(t, NewE2ETestSuite(cfg))
 }
