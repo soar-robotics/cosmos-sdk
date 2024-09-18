@@ -3,6 +3,7 @@ package hd
 import (
 	"github.com/cosmos/go-bip39"
 
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	"github.com/cosmos/cosmos-sdk/crypto/types"
 )
@@ -25,6 +26,8 @@ const (
 // Secp256k1 uses the Bitcoin secp256k1 ECDSA parameters.
 var Secp256k1 = secp256k1Algo{}
 
+var Ed25519 = ed25519Algo{}
+
 type (
 	DeriveFn   func(mnemonic, bip39Passphrase, hdPath string) ([]byte, error)
 	GenerateFn func(bz []byte) types.PrivKey
@@ -37,12 +40,35 @@ type WalletGenerator interface {
 
 type secp256k1Algo struct{}
 
+type ed25519Algo struct{}
+
 func (s secp256k1Algo) Name() PubKeyType {
 	return Secp256k1Type
 }
 
+func (e ed25519Algo) Name() PubKeyType {
+	return Ed25519Type
+}
+
 // Derive derives and returns the secp256k1 private key for the given seed and HD path.
 func (s secp256k1Algo) Derive() DeriveFn {
+	return func(mnemonic, bip39Passphrase, hdPath string) ([]byte, error) {
+		seed, err := bip39.NewSeedWithErrorChecking(mnemonic, bip39Passphrase)
+		if err != nil {
+			return nil, err
+		}
+
+		masterPriv, ch := ComputeMastersFromSeed(seed)
+		if len(hdPath) == 0 {
+			return masterPriv[:], nil
+		}
+		derivedKey, err := DerivePrivateKeyForPath(masterPriv, ch, hdPath)
+
+		return derivedKey, err
+	}
+}
+
+func (e ed25519Algo) Derive() DeriveFn {
 	return func(mnemonic, bip39Passphrase, hdPath string) ([]byte, error) {
 		seed, err := bip39.NewSeedWithErrorChecking(mnemonic, bip39Passphrase)
 		if err != nil {
@@ -66,5 +92,12 @@ func (s secp256k1Algo) Generate() GenerateFn {
 		copy(bzArr, bz)
 
 		return &secp256k1.PrivKey{Key: bzArr}
+	}
+}
+
+func (e ed25519Algo) Generate() GenerateFn {
+	return func(bz []byte) types.PrivKey {
+		key := ed25519.GenPrivKeyFromSecret(bz)
+		return &ed25519.PrivKey{Key: key.Key}
 	}
 }
